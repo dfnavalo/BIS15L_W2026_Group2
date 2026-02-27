@@ -30,4 +30,24 @@ surgery <- read_csv("data/surgery.csv") %>%
 ```{r}
 names(surgery)
 ```
-2.
+2.What is the distribution of patient age and race?
+```{r}
+surgery %>% 
+  filter(race!="NA") %>% 
+  group_by(race) %>% 
+  summarise(
+    n = n(),
+    min_age=min(age, na.rm = T),
+    max_age=max(age, na.rm = T),
+    mean_age = mean(age, na.rm = T),
+    median_age = median(age, na.rm = T)
+  ) %>% 
+  arrange(desc(n))
+```
+
+
+3.
+```{r}
+
+```
+
