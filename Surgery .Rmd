@@ -45,8 +45,52 @@ surgery %>%
   arrange(desc(n))
 ```
 
+3.Is age associated with mortality? 
+```{r}
 
-3.
+```
+
+4. Is the relationship between age and mortality consistent across different months?
+```{r}
+
+```
+
+5. How many males and females were sampled in this study?
+```{r}
+
+```
+
+6.Is mortality higher in males or females?
+```{r}
+
+```
+
+7.What month is mortality highest in?
+```{r}
+
+```
+
+8. What complication shows the highest mortality?
+```{r}
+
+```
+
+9.Does ASA status predict mortality?
+```{r}
+
+```
+
+10.Does time of day affect outcomes differently for high-risk patients?
+```{r}
+
+```
+
+11.Does weekday or weekend affect outcomes?
+```{r}
+
+```
+
+12.Is there any association between moon phase and mortality?
 ```{r}
 
 ```
