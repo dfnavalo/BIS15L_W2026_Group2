@@ -47,7 +47,8 @@ surgery %>%
 
 3.Is age associated with mortality? 
 ```{r}
-
+surgery %>% 
+  
 ```
 
 4. Is the relationship between age and mortality consistent across different months?
