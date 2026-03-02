@@ -48,17 +48,40 @@ surgery %>%
 3.Is age associated with mortality? 
 ```{r}
 surgery %>% 
-  
+  group_by(mort30) %>% 
+  summarise(
+    mean_age = mean(age, na.rm = T),
+    sd_age = sd(age, na.rm = T),
+    n = n()
+  )
 ```
 
 4. Is the relationship between age and mortality consistent across different months?
 ```{r}
-
+surgery %>% 
+  group_by(month, mort30) %>% 
+  summarise(
+    mean_age = mean(age, na.rm = T),
+    n = n()
+  )
 ```
 
 5. How many males and females were sampled in this study?
 ```{r}
+surgery %>% 
+  filter(gender!="NA") %>% 
+  count(gender)
+```
 
+```{r}
+ surgery %>% 
+  filter(gender != "NA") %>% 
+  count(gender) %>% 
+  ggplot(aes(x = gender, y = n, fill = gender)) +
+  geom_col() +
+  labs(title = "Number of Males and Females",
+       x = "Gender",
+       y = "Count")
 ```
 
 6.Is mortality higher in males or females?
