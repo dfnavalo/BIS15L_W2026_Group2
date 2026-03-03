@@ -78,7 +78,7 @@ surgery %>%
   filter(gender != "NA") %>% 
   count(gender) %>% 
   ggplot(aes(x = gender, y = n, fill = gender)) +
-  geom_col() +
+  geom_col(fill= "turquoise4") +
   labs(title = "Number of Males and Females",
        x = "Gender",
        y = "Count")
@@ -96,12 +96,50 @@ glimpse(surgery)
 
 8. What complication shows the highest mortality?
 ```{r}
-
+surgery %>%
+  filter(mort30 == "Yes") %>%
+  select(baseline_cancer, baseline_cvd, baseline_dementia,
+         baseline_diabetes, baseline_digestive,
+         baseline_osteoart, baseline_psych,
+         baseline_pulmonary) %>%
+  summarise_all(~sum(. == "Yes", na.rm = T))
+```
+```{r}
+surgery %>%
+  filter(mort30 == "Yes") %>%
+  select(baseline_cancer, baseline_cvd, baseline_dementia,
+         baseline_diabetes, baseline_digestive,
+         baseline_osteoart, baseline_psych,
+         baseline_pulmonary) %>%
+  summarise_all(~sum(. == "Yes", na.rm = TRUE)) %>%
+  pivot_longer(everything(),
+               names_to = "complication",
+               values_to = "deaths") %>%
+  ggplot(aes(x = reorder(complication, deaths), y = deaths)) +
+  geom_col(fill= "turquoise4") +
+  coord_flip() +
+  labs(title = "Deaths by Baseline Complication",
+       x = "Complication",
+       y = "Number of Deaths")
 ```
 
 9.Does ASA status predict mortality?
 ```{r}
-
+surgery %>%
+  filter(asa_status!="NA") %>% 
+  group_by(asa_status) %>%
+  summarise(mortality_rate = mean(mort30 == "Yes", na.rm = T))
+```
+```{r}
+surgery %>%
+  filter(asa_status != "NA") %>% 
+  group_by(asa_status) %>%
+  summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T)) %>%
+  ggplot(aes(x = asa_status, y = mortality_rate)) +
+  geom_col(fill = "turquoise4") +
+  labs(title = "Mortality Rate by ASA Status",
+       x = "ASA Status",
+       y = "Mortality Rate")
 ```
 
 10.Does time of day affect outcomes differently for high-risk patients?
@@ -146,8 +184,6 @@ surgery %>%
     mortality_rate = mean(mort30 == "Yes", na.rm = T),
     .groups = "drop")
 ```
-
-
 
 
 12.Is there any association between moon phase and mortality?
