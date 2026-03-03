@@ -86,7 +86,7 @@ surgery %>%
 
 6.Is mortality higher in males or females?
 ```{r}
-
+glimpse(surgery)
 ```
 
 7.What month is mortality highest in?
