@@ -198,26 +198,7 @@ surgery %>%
 ```
 
 
-
-11.Does weekday or weekend affect outcomes?
-No, weekend values to compare.
-```{r}
-unique(surgery$dow)
-```
-
-```{r}
-surgery <- surgery %>% 
-  mutate(weekend = dow %in% c("Sat", "Sun"))
-```
-
-```{r}
-surgery %>% 
-  group_by(weekend) %>% 
-  summarize(
-    mortality_rate = mean(mort30 == "Yes", na.rm = T),
-    .groups = "drop")
-```
-
+#No weekend data, deleted question 11
 
 12.Is there any association between moon phase and mortality?
 ```{r}
