@@ -238,3 +238,15 @@ moon %>%
   theme_minimal()
 ```
 
+13. Create a Shiny App...
+```{r, eval=F, echo=T}
+ui <- fluidPage(
+  
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
