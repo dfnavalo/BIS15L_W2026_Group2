@@ -12,6 +12,8 @@ output:
 ## Load the libraries
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
+library(shiny)
+library(shinythemes)
 library(janitor)
 ```
 
@@ -78,7 +80,7 @@ surgery %>%
   filter(gender != "NA") %>% 
   count(gender) %>% 
   ggplot(aes(x = gender, y = n, fill = gender)) +
-  geom_col() +
+  geom_col(fill= "turquoise4") +
   labs(title = "Number of Males and Females",
        x = "Gender",
        y = "Count")
@@ -86,36 +88,145 @@ surgery %>%
 
 6.Is mortality higher in males or females?
 ```{r}
+surgery %>%
+  filter(gender != "NA") %>%
+  count(gender, mort30)
+```
 
+```{r}
+surgery %>%
+  filter(gender != "NA") %>%
+  group_by(gender) %>%
+  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>%
+  ggplot(aes(x = gender, y = mortality)) +
+  geom_col(fill = "turquoise4") +
+  labs(title = "Deaths by Gender",
+       x = "Gender",
+       y = "Number of Deaths")
 ```
 
 7.What month is mortality highest in?
 ```{r}
+surgery %>%
+  filter(month != "NA") %>%
+   mutate(month = factor(month, c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))) %>%
+  group_by(month) %>%
+  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>%
+  arrange(month)
+```
 
+```{r}
+surgery %>%
+  filter(month != "NA") %>%
+  mutate(month = factor(month, c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))) %>%
+  group_by(month) %>%
+  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>%
+  ggplot(aes(x = month, y = mortality)) +
+  geom_col(fill = "turquoise4") +
+  labs(title = "Deaths by Month",
+       x = "Month",
+       y = "Number of Deaths")
 ```
 
 8. What complication shows the highest mortality?
 ```{r}
-
+surgery %>%
+  filter(mort30 == "Yes") %>%
+  select(baseline_cancer, baseline_cvd, baseline_dementia,
+         baseline_diabetes, baseline_digestive,
+         baseline_osteoart, baseline_psych,
+         baseline_pulmonary) %>%
+  summarise_all(~sum(. == "Yes", na.rm = T))
+```
+```{r}
+surgery %>%
+  filter(mort30 == "Yes") %>%
+  select(baseline_cancer, baseline_cvd, baseline_dementia,
+         baseline_diabetes, baseline_digestive,
+         baseline_osteoart, baseline_psych,
+         baseline_pulmonary) %>%
+  summarise_all(~sum(. == "Yes", na.rm = TRUE)) %>%
+  pivot_longer(everything(),
+               names_to = "complication",
+               values_to = "deaths") %>%
+  ggplot(aes(x = reorder(complication, deaths), y = deaths)) +
+  geom_col(fill= "turquoise4") +
+  coord_flip() +
+  labs(title = "Deaths by Baseline Complication",
+       x = "Complication",
+       y = "Number of Deaths")
 ```
 
 9.Does ASA status predict mortality?
 ```{r}
+surgery %>%
+  filter(asa_status!="NA") %>% 
+  group_by(asa_status) %>%
+  summarise(mortality_rate = mean(mort30 == "Yes", na.rm = T))
+```
 
+```{r}
+surgery %>%
+  filter(asa_status != "NA") %>% 
+  group_by(asa_status) %>%
+  summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T)) %>%
+  ggplot(aes(x = asa_status, y = mortality_rate)) +
+  geom_col(fill = "turquoise4") +
+  labs(title = "Mortality Rate by ASA Status",
+       x = "ASA Status",
+       y = "Mortality Rate")
 ```
 
 10.Does time of day affect outcomes differently for high-risk patients?
-```{r}
 
+```{r}
+surgery <- surgery %>% 
+  mutate(high_risk = asa_status %in% c("III", "IV", "V"),
+         hour_group = floor(hour)) 
 ```
 
-11.Does weekday or weekend affect outcomes?
 ```{r}
-
+surgery %>% 
+  group_by(high_risk, hour_group) %>% 
+  summarize(
+    mortality_rate = mean(mort30 == "Yes", na.rm = T),
+    .groups = "drop"
+  ) %>% 
+  ggplot(aes(x = hour_group,
+             y = mortality_rate,
+             color = high_risk))+
+  geom_line()+
+  theme_minimal()
 ```
 
-12.Is there any association between moon phase and mortality?
+11.Is there any association between moon phase and mortality?
 ```{r}
-
+moon <- surgery %>% 
+  group_by(moonphase) %>% 
+  summarize(
+    mortality_rate = mean(mort30 == "Yes", na.rm = T),
+    n = n(),
+    .groups = "drop")
 ```
 
+```{r}
+moon %>% 
+   ggplot(aes(x = moonphase,
+             y = mortality_rate,
+             fill = moonphase))+
+  geom_col()+
+  theme_minimal()
+```
+
+12. Create a Shiny App...
+```{r, eval=F, echo=T}
+ui <- fluidPage(
+  
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
