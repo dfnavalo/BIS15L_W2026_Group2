@@ -12,6 +12,8 @@ output:
 ## Load the libraries
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
+library(shiny)
+library(shinythemes)
 library(janitor)
 ```
 
@@ -197,10 +199,7 @@ surgery %>%
   theme_minimal()
 ```
 
-
-#No weekend data, deleted question 11
-
-12.Is there any association between moon phase and mortality?
+11.Is there any association between moon phase and mortality?
 ```{r}
 moon <- surgery %>% 
   group_by(moonphase) %>% 
@@ -219,7 +218,7 @@ moon %>%
   theme_minimal()
 ```
 
-13. Create a Shiny App...
+12. Create a Shiny App...
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
   
