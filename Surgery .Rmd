@@ -217,49 +217,15 @@ moon %>%
   geom_col()+
   theme_minimal()
 ```
-19			
-Feb	17			
-Mar	12			
-Apr	12			
-May	10			
-Jun	14			
-Jul	12			
-Aug	9			
-Sep	16			
-Oct	8	
-Nov	5			
-Dec	4	
-```{r}
-death_by_month <- surgery %>%
-  filter(month != "NA") %>%
-   mutate(month = factor(month, c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))) %>%
-  group_by(month) %>%
-  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>%
-  arrange(month)
-```
 
 12. Create a Shiny App...
-the range of death numbers filtered by month
 ```{r, eval=F, echo=T}
-ui <- dashboardPage(
-  dashboardHeader(title = "The Range of Number of Deaths of Patients by Month"),
-  dashboardSidebar(
-    selectInput(
-      "x"= "Select Month",
-      choices= unique(death_by_month$month),
-      multiple = TRUE,
-        selected = unique(death_by_month$month)
-    ),
-    dashboardBody(
-      plotOutput("plot", width="600px", height= "500px")
-    )
-  )
+ui <- fluidPage(
+  
 )
 
 server <- function(input, output, session) {
-  output$plot <- renderPlot({
-    
-  })
+  
 }
 
 shinyApp(ui, server)
