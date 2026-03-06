@@ -219,13 +219,43 @@ moon %>%
 ```
 
 12. Create a Shiny App...
+```{r}
+data_by_month <- surgery %>%
+  filter(month != "NA") %>%
+   mutate(month = factor(month, c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))) %>%
+  group_by(month) %>%
+  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>%
+  arrange(month)
+```
+
 ```{r, eval=F, echo=T}
-ui <- fluidPage(
-  
-)
+ui <- dashboardPage(
+  dashboardHeader(title="The Range of Amount of Deaths by Month"),
+  dashboardSidebar(
+    selectInput(
+       "y", 
+        "Select Month(s):", 
+        choices = unique(data_by_month$month),
+        multiple = TRUE,
+        selected = unique(data_by_month$month)
+    ),
+    dashboardBody(
+           plotOutput("plot", width="600px", height= "500px")
+    )
+  )
 
 server <- function(input, output, session) {
-  
+  output$plot <- renderPlot(
+    surgery %>%
+      filter(month!="NA") %>%
+      ggplot(aes(x=month, y=.data[[input$y]],
+             fill=month))+
+      geom_boxplot(alpha=0.7)+
+      labs(title="Range of Death Count by Month",
+           x="Month",
+           y="Number of Deaths")+
+      theme_minimal()
+  )
 }
 
 shinyApp(ui, server)
