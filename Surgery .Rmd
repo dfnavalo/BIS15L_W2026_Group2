@@ -229,6 +229,8 @@ data_by_month <- surgery %>%
 ```
 
 ```{r, eval=F, echo=T}
+library(shiny)
+
 ui <- dashboardPage(
   dashboardHeader(title = "The Range of Amount of Deaths by Month"),
   
@@ -244,7 +246,18 @@ ui <- dashboardPage(
   
   dashboardBody(
     plotOutput("plot", width = "600px", height = "500px")
-  )
+  dashboardHeader("Range of Deaths in Different Measurements of Time")
+  dasboardSidebar(
+    selectInput("y",
+                choices = c("hour",
+                            "dow",
+                            "month",
+                            "moonphase"
+                            ),
+                selected="hour")
+  ),
+  dashboardBody(
+         plotOutput("plot", width="600px", height= "500px")
 )
 
 server <- function(input, output, session) {
@@ -260,6 +273,8 @@ server <- function(input, output, session) {
         y = "Number of Deaths"
       ) +
       theme_minimal()
+      count(mort30)
+      filter()
   })
 }
 
