@@ -36,18 +36,18 @@ names(surgery)
 2.What is the distribution of patient age and race?
 ```{r}
 surgery %>% 
-  group_by(race) %>% 
-  summarise(
-    n = n(),
-    min_age=min(age, na.rm = T),
-    max_age=max(age, na.rm = T),
-    mean_age = mean(age, na.rm = T),
-    median_age = median(age, na.rm = T)
-  ) %>% 
-  arrange(desc(n))
+  filter(race!="NA") %>% 
+  ggplot(aes(x = race, y = age, fill = race)) +
+  geom_boxplot(na.rm=T, alpha=0.6) +
+  labs(
+    title = "Age Distribution by Race",
+    x = NULL,
+    y = "Age(years)"
+  ) +
+  theme_minimal()
 ```
 
-3.Is age associated with mortality? 
+3.Is age associated with 30-day mortality? 
 ```{r}
 surgery %>% 
   group_by(mort30) %>% 
@@ -56,6 +56,18 @@ surgery %>%
     sd_age = sd(age, na.rm = T),
     n = n()
   )
+```
+```{r}
+surgery %>% 
+  filter(!is.na(age), mort30 != "NA") %>% 
+  ggplot(aes(x = mort30, y = age, fill = mort30)) +
+  geom_boxplot(na.rm=T, alpha=0.6) +
+  labs(
+    title = "Age Distribution by Mortality Outcome",
+    x = "30 Day Mortality",
+    y = "Age"
+  ) +
+  theme_minimal()
 ```
 
 4. Is the relationship between age and mortality consistent across different months?
@@ -68,7 +80,7 @@ surgery %>%
   )
 ```
 
-5. How many males and females were sampled in this study?
+5. How many males and females were included in this study? 
 ```{r}
 surgery %>% 
    filter(gender!="NA") %>% 
@@ -82,8 +94,8 @@ surgery %>%
   ggplot(aes(x = gender, y = n, fill = gender)) +
   geom_col(fill= "turquoise4") +
   labs(title = "Number of Males and Females",
-       x = "Gender",
-       y = "Count")
+       x = NULL,
+       y = "Count") 
 ```
 
 6.Is mortality higher in males or females?
@@ -128,7 +140,7 @@ surgery %>%
        y = "Number of Deaths")
 ```
 
-8. What complication shows the highest mortality?
+8. Which baseline complication is associated with the highest number of deaths?
 ```{r}
 surgery %>%
   filter(mort30 == "Yes") %>%
@@ -167,14 +179,16 @@ surgery %>%
 
 ```{r}
 surgery %>%
-  filter(asa_status != "NA") %>% 
-  group_by(asa_status) %>%
-  summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T)) %>%
-  ggplot(aes(x = asa_status, y = mortality_rate)) +
-  geom_col(fill = "turquoise4") +
-  labs(title = "Mortality Rate by ASA Status",
-       x = "ASA Status",
-       y = "Mortality Rate")
+  filter(asa_status != "NA", !is.na(age)) %>%
+  ggplot(aes(x = age)) +
+  geom_density(fill = "steelblue", alpha = 0.4, color = "black") +
+  facet_wrap(~ asa_status) +
+  labs(
+    title = "Distribution of Age by ASA Status",
+    x = "Age",
+    y = "Density"
+  ) +
+  theme_minimal()
 ```
 
 10.Does time of day affect outcomes differently for high-risk patients?
@@ -188,10 +202,8 @@ surgery <- surgery %>%
 ```{r}
 surgery %>% 
   group_by(high_risk, hour_group) %>% 
-  summarize(
-    mortality_rate = mean(mort30 == "Yes", na.rm = T),
-    .groups = "drop"
-  ) %>% 
+  summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T),
+    .groups = "drop" ) %>% 
   ggplot(aes(x = hour_group,
              y = mortality_rate,
              color = high_risk))+
