@@ -229,40 +229,29 @@ data_by_month <- surgery %>%
 ```
 
 ```{r, eval=F, echo=T}
-ui <- fluidPage(
-  
-  titlePanel("Deaths per Month from Surgery Data"),
-  
-  sidebarLayout(
-    
-    sidebarPanel(
-      selectInput(
-        "month_select",
-        "Select Month:",
-        choices = c("month",
-                    "moonphase"),
-        selected = unique(data_by_month$month)[1]
-      )
-    ),
-    
-    mainPanel(
-      plotOutput("plot", width="600px", height= "500px")
-    )
+library(shiny)
+
+ui <- dashboardPage(
+  dashboardHeader("Range of Deaths in Different Measurements of Time")
+  dasboardSidebar(
+    selectInput("y",
+                choices = c("hour",
+                            "dow",
+                            "month",
+                            "moonphase"
+                            ),
+                selected="hour")
+  ),
+  dashboardBody(
+         plotOutput("plot", width="600px", height= "500px")
   )
 )
+
 server <- function(input, output, session) {
   output$plot <- renderPlot({
-   surgery %>%
-      filter(month == input$month_select) %>%
-      count(mort30) %>%
-      ggplot(aes(x = month, y = count(mort30))) +
-      geom_boxplot(fill = "purple") +
-      labs(
-        title = paste("Range of Deaths in", input$month_select),
-        x = "Month",
-        y = "Deaths"
-      ) +
-      theme_minimal()
+    surgery %>%
+      count(mort30)
+      filter()
   })
 }
 
