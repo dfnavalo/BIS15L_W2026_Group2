@@ -228,32 +228,38 @@ data_by_month <- surgery %>%
   arrange(month)
 ```
 
+
 ```{r, eval=F, echo=T}
 library(shiny)
 
-ui <- dashboardPage(
-  dashboardHeader("Range of Deaths in Different Measurements of Time")
-  dasboardSidebar(
-    selectInput("y",
-                choices = c("hour",
-                            "dow",
-                            "month",
-                            "moonphase"
-                            ),
-                selected="hour")
-  ),
-  dashboardBody(
-         plotOutput("plot", width="600px", height= "500px")
-  )
+ui <- fluidPage(
+  selectInput("y",
+              "Select Measurement of Time",
+              choices=c("hour",
+                        "dow",
+                        "month",
+                        "moonphase"),
+              selected="hour"),
+    plotOutput("plot", width="600px", height= "500px")
+
 )
 
 server <- function(input, output, session) {
   output$plot <- renderPlot({
-    surgery %>%
-      count(mort30)
-      filter()
+    
+    surgery %>% 
+      count(mort30) %>% 
+      ggplot(aes(x = count(mort30),
+                 y = .data[[input$y]],
+                 fill = mort30)) +
+      geom_boxplot(alpha = 0.75) +
+      labs(title = "Number of Deaths at Various Measurements of Time",
+           x = "Number of Deaths",
+           fill = "Number of Deaths") +
+      theme_minimal()
   })
 }
+
 
 shinyApp(ui, server)
 ```
