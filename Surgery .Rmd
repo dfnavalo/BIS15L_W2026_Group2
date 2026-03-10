@@ -252,9 +252,10 @@ data_by_month <- surgery %>%
 12.What time is associated with the highest mortality?
 ```{r}
 surgery %>% 
-  group_by(hour) %>% 
+  mutate(hour_round = floor(hour)) %>% 
+  group_by(hour_round) %>% 
   summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>% 
-  ggplot(aes(x = factor(hour), y = mortality))+
+  ggplot(aes(x = factor(hour_round), y = mortality))+
   geom_col(color="black", fill = "steelblue", alpha=0.8)+
   labs(title = "Death Count By Operation Hour",
        x = "Hour (Military Time)",
