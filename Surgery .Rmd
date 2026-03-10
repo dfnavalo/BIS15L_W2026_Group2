@@ -284,7 +284,16 @@ surgery %>%
   labs(title="Distribution of Age and ASA Status IV-VI")
 ```
 ```{r}
-
+surgery %>%
+  filter(asa_status %in% c("I-II", "III", "IV-VI")) %>%
+  ggplot(aes(x = age)) +
+  geom_density(color = "turquoise4", fill = "turquoise4", alpha = 0.4) +
+  facet_wrap(~ asa_status) +
+  labs(
+    title = "Distribution of Age by ASA Status",
+    x = "Age",
+    y = "Density"
+  )
 ```
 
 15. Create a Shiny App...
