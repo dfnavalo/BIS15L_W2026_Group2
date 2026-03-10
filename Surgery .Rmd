@@ -279,36 +279,50 @@ surgery %>%
 
 
 ```{r, eval=F, echo=T}
-library(shiny)
-
 ui <- fluidPage(
-  selectInput("y",
-              "Select Measurement of Time",
-              choices=c("hour",
-                        "dow",
-                        "month",
-                        "moonphase"),
-              selected="hour"),
-    plotOutput("plot", width="600px", height= "500px")
-
+  selectInput(
+    "y",
+    "Select Measurement of Time",
+    choices = c("hour", "dow", "month", "moonphase"),
+    selected = "hour"
+  ),
+  
+  plotOutput("plot", width = "700px", height = "500px")
 )
 
 server <- function(input, output, session) {
+  
   output$plot <- renderPlot({
     
-    surgery %>% 
-      count(mort30) %>% 
-      ggplot(aes(x = count(mort30),
-                 y = .data[[input$y]],
-                 fill = mort30)) +
-      geom_boxplot(alpha = 0.75) +
-      labs(title = "Number of Deaths at Various Measurements of Time",
-           x = "Number of Deaths",
-           fill = "Number of Deaths") +
+    data <- surgery %>%
+      filter(!is.na(mort30)) %>%
+      mutate(
+        hour = round(hour),
+        month = factor(month,
+                       levels = c("Jan","Feb","Mar","Apr","May","Jun",
+                                  "Jul","Aug","Sep","Oct","Nov","Dec")),
+        dow = factor(dow,
+                     levels = c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")),
+        moonphase = factor(moonphase,
+                           levels = c("New Moon", "First Quarter",
+                                      "Full Moon", "Last Quarter"))
+      ) %>%
+      filter(!is.na(.data[[input$y]])) %>%
+      group_by(.data[[input$y]]) %>%
+      summarize(mortality_rate = mean(mort30 == "Yes", na.rm = TRUE),
+                .groups = "drop")
+    
+    ggplot(data, aes(x = .data[[input$y]], y = mortality_rate)) +
+      geom_col(fill = "turquoise4", alpha = 0.8) +
+      labs(
+        title = paste("Mortality Rate by", input$y),
+        x = input$y,
+        y = "Mortality Rate"
+      ) +
       theme_minimal()
+    
   })
 }
-
 
 shinyApp(ui, server)
 ```
