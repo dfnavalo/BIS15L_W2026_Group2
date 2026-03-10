@@ -251,6 +251,7 @@ moon2 %>%
        x = "Phase of Moon",
        y = "Number of Deaths")
 ```
+
 12. How healthy were the patients based on ASA status?
 ```{r}
 surgery %>% 
