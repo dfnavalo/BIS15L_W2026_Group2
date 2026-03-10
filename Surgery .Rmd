@@ -23,6 +23,8 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
+Surgery Timing: A dataset from 32,001 elective general surgery patients who were treated at Cleveland Clinic between 2005 and 2010. It is well known that lack of sleep and heavy workloads can negatively affect performance. Hospital staff frequently face these challenges, especially during busier periods. Because of this, researchers wanted to determine whether the time at which surgery is performed has any impact on patient outcomes.
+
 
 ```{r}
 surgery <- read_csv("data/surgery.csv") %>% 
@@ -32,6 +34,7 @@ surgery <- read_csv("data/surgery.csv") %>%
 ```{r}
 names(surgery)
 ```
+
 2.What is the distribution of patient age and race?
 ```{r}
 surgery %>% 
@@ -67,17 +70,7 @@ surgery %>%
 ```
 
 
-4. Is the relationship between age and mortality consistent across different months?
-```{r}
-surgery %>% 
-  group_by(month, mort30) %>% 
-  summarise(
-    mean_age = mean(age, na.rm = T),
-    n = n()
-  )
-```
-
-5. How many males and females were sampled in this study?
+4. How many males and females were sampled in this study?
 ```{r}
 surgery %>% 
   filter(gender!="NA") %>% 
@@ -89,13 +82,14 @@ surgery %>%
   filter(gender != "NA") %>% 
   count(gender) %>% 
   ggplot(aes(x = gender, y = n, fill = gender)) +
-  geom_col(fill= "turquoise4") +
+  geom_col(fill= "turquoise4", color ="black", alpha = 0.9) +
   labs(title = "Number of Males and Females",
        x = "Gender",
-       y = "Count")
+       y = "Count")+
+  theme_minimal()
 ```
 
-6.Is mortality higher in males or females?
+5.Is mortality higher in males or females?
 ```{r}
 surgery %>%
   filter(gender != "NA") %>%
@@ -116,7 +110,8 @@ surgery %>%
 ```
 
 
-7.What month is mortality highest in and what month is the best for surgery?
+6.What month is mortality highest in and what month is the best for surgery?
+January has the most deaths, while December has the least.
 ```{r}
 surgery %>%
   filter(month != "NA") %>%
@@ -140,7 +135,7 @@ surgery %>%
        y = "Number of Deaths")
 ```
 
-8. What complication shows the highest mortality?
+7. What complication shows the highest mortality?
 ```{r}
 surgery %>%
   filter(mort30 == "Yes") %>%
@@ -170,7 +165,7 @@ surgery %>%
   theme_minimal()
 ```
 
-9.Does ASA status predict mortality?
+8.Does ASA status predict mortality?
 ```{r}
 surgery %>%
   filter(asa_status!="NA") %>% 
@@ -188,34 +183,7 @@ surgery %>%
   labs(title = "Death Count Based on ASA Status", x = "ASA Status", y = "Number of Deaths")+ theme_minimal()
 ```
 
-10.Does time of day affect outcomes differently for high-risk patients?
-
-```{r}
-surgery <- surgery %>% 
-  mutate(high_risk = asa_status %in% c("III", "IV", "V"),
-         hour_group = floor(hour)) 
-```
-
-```{r}
-surgery %>%
-  group_by(high_risk, hour_group) %>%
-  summarise(
-    mortality_rate = mean(mort30 == "Yes", na.rm = T),
-    .groups = "drop"
-  ) %>%
-  ggplot(aes(x = hour_group, y = mortality_rate, color = high_risk)) +
-  geom_point(size = 2) +
-  geom_line(linewidth = 1) +
-  labs(
-    title = "Mortality Rate by Hour for High-Risk Patients",
-    x = "Hour of Surgery",
-    y = "Mortality Rate"
-  ) +
-  theme_minimal()
-```
-
-
-11.Is there any association between moon phase and mortality?
+9.Is there any association between moon phase and mortality?
 ```{r}
 moon <- surgery %>% 
   group_by(moonphase) %>% 
@@ -258,8 +226,7 @@ moon2 %>%
        x = "Phase of Moon",
        y = "Number of Deaths")
 ```
-
-12. How healthy were the patients based on ASA status?
+10. How healthy were the patients based on ASA status?
 ```{r}
 surgery %>% 
   filter(asa_status!="NA") %>%
@@ -272,7 +239,7 @@ surgery %>%
 ```
 
 
-13.What time is associated with the highest mortality?
+11.What time is associated with the highest mortality?
 ```{r}
 data_by_month <- surgery %>%
   filter(month != "NA") %>%
@@ -282,19 +249,23 @@ data_by_month <- surgery %>%
   arrange(month)
 ```
 
-14. What time is associated with the highest mortality?
+12.What time is associated with the highest mortality?
 ```{r}
 surgery %>% 
-  group_by(hour_group) %>% 
+  group_by(hour) %>% 
   summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>% 
-  ggplot(aes(x = factor(hour_group), y = mortality, ))+
+  ggplot(aes(x = factor(hour), y = mortality))+
   geom_col(color="black", fill = "steelblue", alpha=0.8)+
   labs(title = "Death Count By Operation Hour",
        x = "Hour (Military Time)",
-       y= "Number of Deaths",)+
+       y= "Number of Deaths")+
   theme_minimal()
 ```
-
+14. What is the distrubtion of age for each ASA status? Is there a relationship?
+```{r}
+surgery %>% 
+  
+```
 15. Create a Shiny App...
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
