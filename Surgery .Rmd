@@ -301,7 +301,7 @@ surgery %>%
     title = "Distribution of Age by ASA Status",
     x = "Age",
     y = "Density"
-  )
+  ) #the older someone seems to get, the higher the ASA status
 ```
 
 15. Create a Shiny App...
