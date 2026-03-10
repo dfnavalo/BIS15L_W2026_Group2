@@ -48,15 +48,22 @@ surgery %>%
 ```
 
 
-3.Is age associated with mortality? 
+3.At what age do people undergo surgery more? 
 ```{r}
 surgery %>% 
-  group_by(mort30) %>% 
+  group_by(age) %>% 
   summarise(
-    mean_age = mean(age, na.rm = T),
-    sd_age = sd(age, na.rm = T),
     n = n()
-  )
+  ) %>% 
+  arrange(desc(n))
+```
+```{r}
+surgery %>% 
+  ggplot(aes(x=age))+
+  geom_histogram()+
+  labs(title= "Distribution of Surgery by Age",
+       x=NULL,
+       y="# of Surgery's")
 ```
 
 
