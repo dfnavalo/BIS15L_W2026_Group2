@@ -275,7 +275,7 @@ data_by_month <- surgery %>%
   arrange(month)
 ```
 
-What time is associated with the highest mortality?
+14. What time is associated with the highest mortality?
 ```{r}
 surgery %>% 
   group_by(hour_group) %>% 
@@ -288,7 +288,7 @@ surgery %>%
   theme_minimal()
 ```
 
-14. Create a Shiny App...
+15. Create a Shiny App...
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
   selectInput(
