@@ -262,11 +262,41 @@ surgery %>%
        y= "Number of Deaths")+
   theme_minimal()
 ```
-14. What is the distrubtion of age for each ASA status? Is there a relationship?
+14. What is the distribution of age for each ASA status? Is there a relationship?
 ```{r}
 surgery %>% 
-  
+  filter(asa_status == "I-II") %>%
+  ggplot(aes(x=age))+
+  geom_density(color="turquoise4", fill="turquoise4", alpha=0.3)+
+  labs(title="Distribution of Age and ASA Status I-II")
 ```
+```{r}
+surgery %>% 
+  filter(asa_status == "III") %>%
+  ggplot(aes(x=age))+
+  geom_density(color="turquoise4", fill="turquoise4", alpha=0.3)+
+  labs(title="Distribution of Age and ASA Status III")
+```
+```{r}
+surgery %>% 
+  filter(asa_status == "IV-VI") %>%
+  ggplot(aes(x=age))+
+  geom_density(color="turquoise4", fill="turquoise4", alpha=0.3)+
+  labs(title="Distribution of Age and ASA Status IV-VI")
+```
+```{r}
+surgery %>%
+  filter(asa_status %in% c("I-II", "III", "IV-VI")) %>%
+  ggplot(aes(x = age)) +
+  geom_density(color = "turquoise4", fill = "turquoise4", alpha = 0.4) +
+  facet_wrap(~ asa_status) +
+  labs(
+    title = "Distribution of Age by ASA Status",
+    x = "Age",
+    y = "Density"
+  )
+```
+
 15. Create a Shiny App...
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
