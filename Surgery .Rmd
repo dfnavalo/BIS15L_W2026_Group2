@@ -263,8 +263,25 @@ surgery %>%
     y = "Density"
   ) 
 ```
+11.Does the day of the week that a surgery is performed affect patient mortality?
+```{r}
+surgery %>%
+  filter(dow != "NA") %>%
+  mutate(dow = factor(dow, levels = c("Mon","Tue","Wed","Thu","Fri"))) %>%
+  group_by(dow) %>%
+  summarise(mortality_rate = mean(mort30 == "Yes", na.rm = TRUE)) %>%
+  ggplot(aes(x = dow, y = mortality_rate)) +
+  geom_col(fill = "turquoise4", color = "black", alpha = 0.9) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Mortality Rate by Day of Week",
+    x = "Day of Week",
+    y = "Mortality Rate"
+  ) +
+  theme_minimal()
+```
 
-11. Create a Shiny App...
+12. Create a Shiny App...
 
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
