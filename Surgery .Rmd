@@ -240,19 +240,8 @@ moon2 %>%
        x = "Phase of Moon",
        y = "Number of Deaths")
 ```
-#10. How healthy were the patients based on ASA status?
-```{r}
-surgery %>% 
-  filter(asa_status!="NA") %>%
-  ggplot(aes(x=asa_status))+
-  geom_bar(color="black", fill = "turquoise4", alpha =0.8 )+
-  labs(title="ASA Status", 
-       x="ASA", 
-       y= NULL)+
-  theme_minimal()
-```
 
-11. What surgery hour is associated with the highest mortality rate?
+10. What surgery hour is associated with the highest mortality rate?
 ```{r}
 surgery %>% 
   mutate(hour_round = floor(hour)) %>% 
@@ -266,7 +255,7 @@ surgery %>%
   theme_minimal()
 ```
 
-12. What is the distribution of age for each ASA status? Is there a relationship?
+11. What is the distribution of age for each ASA status? Is there a relationship?
 ```{r}
 surgery %>% 
   filter(asa_status == "I-II") %>%
@@ -302,7 +291,7 @@ surgery %>%
 ```
 
 
-13. Create a Shiny App...
+12. Create a Shiny App...
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
   selectInput(
