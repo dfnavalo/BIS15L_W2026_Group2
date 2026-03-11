@@ -30,12 +30,11 @@ Surgery Timing: A dataset from 32,001 elective general surgery patients who were
 surgery <- read_csv("data/surgery.csv") %>% 
   clean_names()
 ```
-1. What are the variable names?
 ```{r}
 names(surgery)
 ```
 
-2.Whih race had the highest number of surgeries?
+1.Whih race had the highest number of surgeries?
 ```{r}
 surgery %>% 
   group_by(race) %>% 
@@ -55,8 +54,7 @@ surgery %>%
   theme_minimal()
 ```
 
-
-3.At what age do people undergo surgery more? 
+2.At what age do people undergo surgery more? 
 ```{r}
 surgery %>% 
   group_by(age) %>% 
@@ -74,9 +72,10 @@ surgery %>%
        y="# of Surgery's")
 ```
 
-4.Who gets more surgeries, males or females ?
+3.Who gets more surgeries, males or females ?
 ```{r}
 surgery %>% 
+  filter(gender != "NA") %>% 
   group_by(gender) %>% 
   summarise(
     n = n()
@@ -96,7 +95,7 @@ surgery %>%
   theme_minimal()
 ```
 
-5.Is mortality higher in males or females?
+4.Is mortality higher in males or females?
 ```{r}
 surgery %>%
   filter(gender != "NA") %>%
@@ -104,18 +103,15 @@ surgery %>%
 ```
 
 ```{r}
-surgery %>%
-  filter(gender != "NA") %>%
-  group_by(gender) %>%
-  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>%
-  ggplot(aes(x = gender, y = mortality)) +
-  geom_col(fill = "turquoise4", color = "black", alpha =0.9) +
-  labs(title = "Deaths by Gender",
-       x = "Gender",
-       y = "Number of Deaths")+
+surgery %>% 
+  filter(gender != "NA") %>% 
+  group_by(gender) %>% 
+  summarize(deaths = sum(mort30 == "Yes", na.rm = TRUE)) %>% 
+  ggplot(aes(gender, deaths)) + 
+  geom_col(fill="turquoise4", color="black") + 
+  labs( title="Deaths by Gender", x="Gender", y="Number of Deaths" ) + 
   theme_minimal()
 ```
-
 
 6.What month is mortality highest in and what month is the best for surgery?
 January has the most deaths, while December has the least.
@@ -128,18 +124,23 @@ surgery %>%
   arrange(month)
 ```
 
+
 ```{r}
 surgery %>%
-  filter(month != "NA") %>%
-  mutate(month = factor(month, c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))) %>%
+  filter(month!="NA") %>%
+  mutate(month=factor(month,
+                      c("Jan","Feb","Mar","Apr","May","Jun",
+                        "Jul","Aug","Sep","Oct","Nov","Dec"))) %>%
   group_by(month) %>%
-  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>%
-  ggplot(aes(x = month, y = mortality)) +
-  geom_col(fill = "turquoise4", color = "black", alpha = 0.8) +
-  theme_minimal()+
-  labs(title = "Deaths by Month",
-       x = "Month",
-       y = "Number of Deaths")
+  summarise(mortality_rate=mean(mort30=="Yes", na.rm=TRUE)) %>%
+  ggplot(aes(month, mortality_rate, group=1))+
+  geom_line(color="turquoise4", linewidth=1.2)+
+  geom_point(size=3, color="turquoise4")+
+  scale_y_continuous(labels=scales::percent)+
+  labs(title="Mortality Rate by Month",
+       x="Month",
+       y="Mortality Rate")+
+  theme_minimal()
 ```
 
 7. What complication shows the highest mortality?
@@ -172,6 +173,7 @@ surgery %>%
   theme_minimal()
 ```
 
+
 8.Does ASA status predict mortality?
 ```{r}
 surgery %>%
@@ -180,14 +182,19 @@ surgery %>%
   summarise(mortality_rate = mean(mort30 == "Yes", na.rm = T))
 ```
 
+
 ```{r}
-surgery %>% 
-  filter(asa_status != "NA") %>%
-  group_by(asa_status) %>% 
-  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>% 
-  ggplot(aes(x = asa_status, y = mortality)) + 
-  geom_col(fill = "turquoise4", color = "black", alpha = 0.8) + 
-  labs(title = "Death Count Based on ASA Status", x = "ASA Status", y = "Number of Deaths")+ theme_minimal()
+surgery %>%
+  filter(asa_status!="NA") %>%
+  group_by(asa_status) %>%
+  summarise(mortality_rate=mean(mort30=="Yes", na.rm=TRUE)) %>%
+  ggplot(aes(asa_status, mortality_rate))+
+  geom_col(fill="turquoise4", color="black", alpha=0.9)+
+  scale_y_continuous(labels=scales::percent)+
+  labs(title="Mortality Rate by ASA Status",
+       x="ASA Status",
+       y="Mortality Rate")+
+  theme_minimal()
 ```
 
 9.Is there any association between moon phase and mortality?
@@ -206,8 +213,8 @@ moon %>%
   ggplot(aes(x = moonphase,
              y = mortality_rate,
              group = 1)) +
-  geom_point(size = 3, color = "steelblue") +
-  geom_line(color = "steelblue", linewidth = 1) +
+  geom_point(size = 3, color = "turquoise4") +
+  geom_line(color = "turquoise4", linewidth = 1) +
   theme_minimal() + 
   scale_y_continuous(labels = scales::percent) +
   labs(
@@ -227,49 +234,39 @@ moon2 %>%
    ggplot(aes(x = moonphase,
              y = mortality,
              fill = moonphase))+
-  geom_col(fill = "steelblue", color = "black", alpha = 0.8)+
+  geom_col(fill = "turquoise4", color = "black", alpha = 0.8)+
   theme_minimal()+ 
   labs(title = "Death Count For Each Moonphase",
        x = "Phase of Moon",
        y = "Number of Deaths")
 ```
-10. How healthy were the patients based on ASA status?
+#10. How healthy were the patients based on ASA status?
 ```{r}
 surgery %>% 
   filter(asa_status!="NA") %>%
   ggplot(aes(x=asa_status))+
-  geom_bar(color="black", fill = "steelblue", alpha =0.8 )+
+  geom_bar(color="black", fill = "turquoise4", alpha =0.8 )+
   labs(title="ASA Status", 
        x="ASA", 
        y= NULL)+
   theme_minimal()
 ```
 
-
-11.What time is associated with the highest mortality?
-```{r}
-data_by_month <- surgery %>%
-  filter(month != "NA") %>%
-   mutate(month = factor(month, c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"))) %>%
-  group_by(month) %>%
-  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>%
-  arrange(month)
-```
-
-12.What time is associated with the highest mortality?
+11. What surgery hour is associated with the highest mortality rate?
 ```{r}
 surgery %>% 
   mutate(hour_round = floor(hour)) %>% 
   group_by(hour_round) %>% 
   summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>% 
   ggplot(aes(x = factor(hour_round), y = mortality))+
-  geom_col(color="black", fill = "steelblue", alpha=0.8)+
+  geom_col(color="black", fill = "turquoise4", alpha=0.8)+
   labs(title = "Death Count By Operation Hour",
        x = "Hour (Military Time)",
        y= "Number of Deaths")+
   theme_minimal()
 ```
-14. What is the distribution of age for each ASA status? Is there a relationship?
+
+12. What is the distribution of age for each ASA status? Is there a relationship?
 ```{r}
 surgery %>% 
   filter(asa_status == "I-II") %>%
@@ -304,7 +301,8 @@ surgery %>%
   ) #the older someone seems to get, the higher the ASA status
 ```
 
-15. Create a Shiny App...
+
+13. Create a Shiny App...
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
   selectInput(
