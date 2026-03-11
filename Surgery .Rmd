@@ -113,8 +113,8 @@ surgery %>%
   theme_minimal()
 ```
 
-6.What month is mortality highest in and what month is the best for surgery?
-January has the most deaths, while December has the least.
+5.What month is mortality highest in and what month is the best for surgery?
+#January appears to have the highest mortality rate, while December appears to have the lowest mortality rate.
 ```{r}
 surgery %>%
   filter(month != "NA") %>%
@@ -143,7 +143,7 @@ surgery %>%
   theme_minimal()
 ```
 
-7. What complication shows the highest mortality?
+6. What complication shows the highest mortality?
 ```{r}
 surgery %>%
   filter(mort30 == "Yes") %>%
@@ -174,7 +174,7 @@ surgery %>%
 ```
 
 
-8.Does ASA status predict mortality?
+7.Does ASA status predict mortality?
 ```{r}
 surgery %>%
   filter(asa_status!="NA") %>% 
@@ -197,7 +197,7 @@ surgery %>%
   theme_minimal()
 ```
 
-9.Is there any association between moon phase and mortality?
+8.Is there any association between moon phase and mortality?
 ```{r}
 moon <- surgery %>% 
   group_by(moonphase) %>% 
@@ -223,60 +223,27 @@ moon %>%
     y = "Mortality Rate"
   )
 ```
-```{r}
-moon2 <- surgery %>% 
-  group_by(moonphase) %>% 
-   summarize(mortality = sum(mort30 == "Yes", na.rm = T))
-```
 
-```{r}
-moon2 %>% 
-   ggplot(aes(x = moonphase,
-             y = mortality,
-             fill = moonphase))+
-  geom_col(fill = "turquoise4", color = "black", alpha = 0.8)+
-  theme_minimal()+ 
-  labs(title = "Death Count For Each Moonphase",
-       x = "Phase of Moon",
-       y = "Number of Deaths")
-```
-
-10. What surgery hour is associated with the highest mortality rate?
+9. What surgery hour is associated with the highest mortality rate?
+#The mortality rate varies slightly depending on the hour of surgery. Surgeries performed earlier in the day tend to have lower mortality rates, while surgeries later in the afternoon show slightly higher mortality rates, suggesting that earlier surgery times may be associated with better patient outcomes.
 ```{r}
 surgery %>% 
   mutate(hour_round = floor(hour)) %>% 
   group_by(hour_round) %>% 
-  summarize(mortality = sum(mort30 == "Yes", na.rm = T)) %>% 
-  ggplot(aes(x = factor(hour_round), y = mortality))+
-  geom_col(color="black", fill = "turquoise4", alpha=0.8)+
-  labs(title = "Death Count By Operation Hour",
-       x = "Hour (Military Time)",
-       y= "Number of Deaths")+
+  summarize(mortality_rate = mean(mort30 == "Yes", na.rm = TRUE)) %>% 
+  ggplot(aes(x = factor(hour_round), y = mortality_rate)) +
+  geom_col(color = "black", fill = "turquoise4", alpha = 0.8) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Mortality Rate by Operation Hour",
+    x = "Hour (Military Time)",
+    y = "Mortality Rate"
+  ) +
   theme_minimal()
 ```
 
-11. What is the distribution of age for each ASA status? Is there a relationship?
-```{r}
-surgery %>% 
-  filter(asa_status == "I-II") %>%
-  ggplot(aes(x=age))+
-  geom_density(color="turquoise4", fill="turquoise4", alpha=0.3)+
-  labs(title="Distribution of Age and ASA Status I-II")
-```
-```{r}
-surgery %>% 
-  filter(asa_status == "III") %>%
-  ggplot(aes(x=age))+
-  geom_density(color="turquoise4", fill="turquoise4", alpha=0.3)+
-  labs(title="Distribution of Age and ASA Status III")
-```
-```{r}
-surgery %>% 
-  filter(asa_status == "IV-VI") %>%
-  ggplot(aes(x=age))+
-  geom_density(color="turquoise4", fill="turquoise4", alpha=0.3)+
-  labs(title="Distribution of Age and ASA Status IV-VI")
-```
+10. What is the distribution of age for each ASA status? Is there a relationship?
+
 ```{r}
 surgery %>%
   filter(asa_status %in% c("I-II", "III", "IV-VI")) %>%
@@ -290,8 +257,7 @@ surgery %>%
   ) #the older someone seems to get, the higher the ASA status
 ```
 
-
-12. Create a Shiny App...
+11. Create a Shiny App...
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
   selectInput(
