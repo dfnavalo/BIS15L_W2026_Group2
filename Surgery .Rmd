@@ -35,6 +35,7 @@ names(surgery)
 ```
 
 1.Whih race had the highest number of surgeries?
+#Caucasians had the highest number of surgeries
 ```{r}
 surgery %>% 
   group_by(race) %>% 
@@ -55,6 +56,7 @@ surgery %>%
 ```
 
 2.At what age do people undergo surgery more? 
+#90 year olds underwent surgery the most
 ```{r}
 surgery %>% 
   group_by(age) %>% 
@@ -73,6 +75,7 @@ surgery %>%
 ```
 
 3.Who gets more surgeries, males or females ?
+#Females get more surgeries than males
 ```{r}
 surgery %>% 
   filter(gender != "NA") %>% 
@@ -96,6 +99,7 @@ surgery %>%
 ```
 
 4.Is mortality higher in males or females?
+#Mortality is higher in males than in females
 ```{r}
 surgery %>%
   filter(gender != "NA") %>%
@@ -144,6 +148,7 @@ surgery %>%
 ```
 
 6. What complication shows the highest mortality?
+#Cardiovascular/cerebrovascular disease show the highest mortality
 ```{r}
 surgery %>%
   filter(mort30 == "Yes") %>%
@@ -175,6 +180,7 @@ surgery %>%
 
 
 7.Does ASA status predict mortality?
+#ASA statuses IV-VI have the highest mortality rates, albeit it is only 4%
 ```{r}
 surgery %>%
   filter(asa_status!="NA") %>% 
@@ -198,6 +204,7 @@ surgery %>%
 ```
 
 8.Is there any association between moon phase and mortality?
+#Full moons have the highest mortality rate, while the new moon has the lowest mortality rate
 ```{r}
 moon <- surgery %>% 
   group_by(moonphase) %>% 
@@ -243,7 +250,7 @@ surgery %>%
 ```
 
 10. What is the distribution of age for each ASA status? Is there a relationship?
-
+#The older someone seems to get, the higher the ASA status is, with the density graphs skewing further left the higher the ASA status levels go
 ```{r}
 surgery %>%
   filter(asa_status %in% c("I-II", "III", "IV-VI")) %>%
@@ -254,7 +261,7 @@ surgery %>%
     title = "Distribution of Age by ASA Status",
     x = "Age",
     y = "Density"
-  ) #the older someone seems to get, the higher the ASA status
+  ) 
 ```
 
 11. Create a Shiny App...
