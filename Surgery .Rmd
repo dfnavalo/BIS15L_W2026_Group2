@@ -3,7 +3,7 @@ title: "Surgery Group 2"
 name: "Ale, Daniella, Aaliyah"
 date: "2026-02-27"
 output:
-  html_document:1
+  html_document:
     theme: spacelab
     toc: no
 
@@ -19,7 +19,8 @@ library(janitor)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Project Overview
+This project analyzes whether surgery timing is associated with patient outcomes using data from 32,001 elective general surgery patients treated at Cleveland Clinic between 2005 and 2010.
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
@@ -34,7 +35,7 @@ surgery <- read_csv("data/surgery.csv") %>%
 names(surgery)
 ```
 
-1.Whih race had the highest number of surgeries?
+1. Which race had the highest number of surgeries?
 #Caucasians had the highest number of surgeries
 ```{r}
 surgery %>% 
@@ -117,8 +118,63 @@ surgery %>%
   theme_minimal()
 ```
 
-5.What month is mortality highest in and what month is the best for surgery?
-#January appears to have the highest mortality rate, while December appears to have the lowest mortality rate.
+
+5.Does ASA status predict mortality?
+#ASA statuses IV-VI have the highest mortality rates, albeit it is only 4%
+```{r}
+surgery %>%
+  filter(asa_status!="NA") %>% 
+  group_by(asa_status) %>%
+  summarise(mortality_rate = mean(mort30 == "Yes", na.rm = T))
+```
+
+```{r}
+surgery %>%
+  filter(asa_status!="NA") %>%
+  group_by(asa_status) %>%
+  summarise(mortality_rate=mean(mort30=="Yes", na.rm=TRUE)) %>%
+  ggplot(aes(asa_status, mortality_rate))+
+  geom_col(fill="turquoise4", color="black", alpha=0.9)+
+  scale_y_continuous(labels=scales::percent)+
+  labs(title="Mortality Rate by ASA Status",
+       x="ASA Status",
+       y="Mortality Rate")+
+  theme_minimal()
+```
+
+
+6. What is the distribution of age for each ASA status? Is there a relationship?
+#The older someone seems to get, the higher the ASA status is, with the density graphs skewing further left the higher the ASA status levels go
+```{r}
+surgery %>%
+  filter(asa_status %in% c("I-II", "III", "IV-VI")) %>%
+  ggplot(aes(x = age)) +
+  geom_density(color = "turquoise4", fill = "turquoise4", alpha = 0.4) +
+  facet_wrap(~ asa_status) +
+  labs(
+    title = "Distribution of Age by ASA Status",
+    x = "Age",
+    y = "Density"
+  ) 
+```
+
+
+7.Do 30-day mortality rates differ by type of surgical procedure?
+```{r}
+surgery %>% 
+  group_by(ahrq_ccs) %>% 
+  summarise(ccsmort30rate = mean(ccsmort30rate, na.rm = TRUE)) %>% 
+  ggplot(aes(x = reorder(ahrq_ccs, ccsmort30rate), y = ccsmort30rate)) +
+  geom_col(fill = "turquoise4") +
+  coord_flip() +
+  labs(title = "30-Day Mortality by Procedure",
+       x = NULL,
+       y = "Rate") +
+  theme_light()
+```
+
+8.What month is mortality highest in and what month is the best for surgery?
+#January appears to have the highest mortality rate, while November appears to have the lowest mortality rate, meaning november is the best month to have surgery. 
 ```{r}
 surgery %>%
   filter(month != "NA") %>%
@@ -146,64 +202,7 @@ surgery %>%
        y="Mortality Rate")+
   theme_minimal()
 ```
-
-6. What complication shows the highest mortality?
-#Cardiovascular/cerebrovascular disease show the highest mortality
-```{r}
-surgery %>%
-  filter(mort30 == "Yes") %>%
-  select(baseline_cancer, baseline_cvd, baseline_dementia,
-         baseline_diabetes, baseline_digestive,
-         baseline_osteoart, baseline_psych,
-         baseline_pulmonary) %>%
-  summarise_all(~sum(. == "Yes", na.rm = T))
-```
-```{r}
-surgery %>%
-  filter(mort30 == "Yes") %>%
-  select(baseline_cancer, baseline_cvd, baseline_dementia,
-         baseline_diabetes, baseline_digestive,
-         baseline_osteoart, baseline_psych,
-         baseline_pulmonary) %>%
-  summarise_all(~sum(. == "Yes", na.rm = TRUE)) %>%
-  pivot_longer(everything(),
-               names_to = "complication",
-               values_to = "deaths") %>%
-  ggplot(aes(x = reorder(complication, deaths), y = deaths)) +
-  geom_col(fill= "turquoise4", color ="black", alpha = 0.9) +
-  coord_flip() +
-  labs(title = "Deaths by Baseline Complication",
-       x = "Complication",
-       y = "Number of Deaths")+
-  theme_minimal()
-```
-
-
-7.Does ASA status predict mortality?
-#ASA statuses IV-VI have the highest mortality rates, albeit it is only 4%
-```{r}
-surgery %>%
-  filter(asa_status!="NA") %>% 
-  group_by(asa_status) %>%
-  summarise(mortality_rate = mean(mort30 == "Yes", na.rm = T))
-```
-
-
-```{r}
-surgery %>%
-  filter(asa_status!="NA") %>%
-  group_by(asa_status) %>%
-  summarise(mortality_rate=mean(mort30=="Yes", na.rm=TRUE)) %>%
-  ggplot(aes(asa_status, mortality_rate))+
-  geom_col(fill="turquoise4", color="black", alpha=0.9)+
-  scale_y_continuous(labels=scales::percent)+
-  labs(title="Mortality Rate by ASA Status",
-       x="ASA Status",
-       y="Mortality Rate")+
-  theme_minimal()
-```
-
-8.Is there any association between moon phase and mortality?
+9.Is there any association between moon phase and mortality?
 #Full moons have the highest mortality rate, while the new moon has the lowest mortality rate
 ```{r}
 moon <- surgery %>% 
@@ -213,7 +212,6 @@ moon <- surgery %>%
     n = n(),
     .groups = "drop")
 ```
-
 
 ```{r}
 moon %>% 
@@ -231,7 +229,7 @@ moon %>%
   )
 ```
 
-9. What surgery hour is associated with the highest mortality rate?
+10. What surgery hour is associated with the highest mortality rate?
 #The mortality rate varies slightly depending on the hour of surgery. Surgeries performed earlier in the day tend to have lower mortality rates, while surgeries later in the afternoon show slightly higher mortality rates, suggesting that earlier surgery times may be associated with better patient outcomes.
 ```{r}
 surgery %>% 
@@ -249,20 +247,6 @@ surgery %>%
   theme_minimal()
 ```
 
-10. What is the distribution of age for each ASA status? Is there a relationship?
-#The older someone seems to get, the higher the ASA status is, with the density graphs skewing further left the higher the ASA status levels go
-```{r}
-surgery %>%
-  filter(asa_status %in% c("I-II", "III", "IV-VI")) %>%
-  ggplot(aes(x = age)) +
-  geom_density(color = "turquoise4", fill = "turquoise4", alpha = 0.4) +
-  facet_wrap(~ asa_status) +
-  labs(
-    title = "Distribution of Age by ASA Status",
-    x = "Age",
-    y = "Density"
-  ) 
-```
 11.Does the day of the week that a surgery is performed affect patient mortality?
 ```{r}
 surgery %>%
@@ -281,7 +265,7 @@ surgery %>%
   theme_minimal()
 ```
 
-12. Create a Shiny App...
+12.Shiny App
 
 ```{r, eval=F, echo=T}
 ui <- fluidPage(
