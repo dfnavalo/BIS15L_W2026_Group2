@@ -2,97 +2,315 @@ library(tidyverse)
 library(shiny)
 library(shinythemes)
 library(janitor)
-
-surgery <- read_csv("data/surgery.csv") %>% 
-  clean_names()
+library(scales)
 
 ui <- fluidPage(
-  titlePanel("Surgery Timing and Patient Outcomes"),
+  theme = shinytheme("flatly"),
+  
+  tags$head(
+    tags$style(HTML("body { background-color: #f8f9fa;}
+    .app-title { 
+    text-align:center;
+    font-size: 34px;
+    font-weight: 700;
+    color: #d63384;
+    margin-top: 15px;
+    text-align:center;
+    box-shadow: 2px 2px 8px rgba (0,0,0,0.08);
+    }
+    .stat-label {
+    font-size:15px;
+    color: #6c757d;
+    }
+    .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #d63384;
+    }
+    .sidebar-panel {
+    background-color: #ffffff;
+    padding:15px;
+    border-radius: 12px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.08)
+    }
+    .main-panel-box{
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.08)
+    }
+    "))),
+  
+  div(class = "app-title", "Surgery Timing and Patient Outcomes"),
+  
+  fluidRow(
+    column(4,
+           div(class = "stat-box",
+               div(class = "stat-label", textOutput("highest_label")),
+               div(class = "stat-value", textOutput("highest_value")))),
+    column(4,
+           div(class = "stat-box",
+               div(class = "stat-label", textOutput("lowest_label")),
+               div(class = "stat-value", textOutput("lowest_value")))),
+    column(4,
+           div(class = "stat-box",
+               div(class = "stat-label", "Overall Mortality Rate"),
+               div(class = "stat-value", textOutput("overall_mortality"))))
+  ),
   
   sidebarLayout(
     sidebarPanel(
-      selectInput(
-        "timing",
-        "Choose Timing Variable:",
-        choices = c("Hour","Day of Week","Month","Moon Phase"),
-        selected = "Hour"
-      )
+      div(class = "sidebar-panel",
+          h4("Plot Controls"),
+          
+          selectInput(
+            "timing",
+            "Choose Timing Variable",
+            choices = c("Hour", "Day of Week", "Month", "Moonphase"),
+            selected = "Hour"
+          ),
+          
+          selectInput(
+            "plot_color",
+            "Choose Plot Color",
+            choices = c("Pink" = "hotpink",
+                        "Blue" = "steelblue",
+                        "Green" = "darkgreen",
+                        "Purple" = "purple",
+                        "Orange" = "orange"),
+            selected = "steelblue"
+          ),
+          
+          checkboxInput("show_points", "Show Points on Graph", value = T)
+      ),
+      
+      width = 3
     ),
     
     mainPanel(
-      plotOutput("plot", width="700px", height="500px")
+      div(class = "main-panel-box",
+          tabsetPanel(
+            tabPanel(
+              "Plot",
+              br(),
+              plotOutput("plot", width = "100%", height = "520px")
+            ),
+            tabPanel(
+              "About",
+              br(),
+              h4("About Our App"),
+              p("This app explores the relationship between different time variables during surgery and patient mortality."),
+              tags$ul(
+                tags$li("Hour"),
+                tags$li("Day of Week"),
+                tags$li("Month"),
+                tags$li("Moonphase")
+              ),
+              p("Use the sidebar to toggle variables and colors")
+            )
+          )
+      ),
+      width = 9 
     )
   )
 )
 
 server <- function(input, output, session) {
   
-  output$plot <- renderPlot({
+  summary_data <- reactive({
     
-    if(input$timing == "Hour"){
-      
-      surgery %>% 
-        mutate(hour_round = floor(hour)) %>% 
-        group_by(hour_round) %>% 
-        summarize(mortality_rate = mean(mort30 == "Yes", na.rm = TRUE)) %>% 
-        ggplot(aes(x = factor(hour_round), y = mortality_rate))+
-        geom_col(color="black", fill="turquoise4", alpha=0.8)+
-        scale_y_continuous(labels=scales::percent)+
-        labs(title="Mortality Rate by Operation Hour",
-             x="Hour",
-             y="Mortality Rate")+
-        theme_minimal()
-      
-    } else if(input$timing == "Month"){
-      
+    if (input$timing == "Hour") {
       surgery %>%
-        filter(month!="NA") %>%
-        mutate(month=factor(month,
-                            levels=c("Jan","Feb","Mar","Apr","May","Jun",
-                                     "Jul","Aug","Sep","Oct","Nov","Dec"))) %>%
-        group_by(month) %>%
-        summarise(mortality_rate=mean(mort30=="Yes", na.rm=TRUE)) %>%
-        ggplot(aes(month, mortality_rate, group=1))+
-        geom_line(color="turquoise4", linewidth=1.2)+
-        geom_point(size=3, color="turquoise4")+
-        scale_y_continuous(labels=scales::percent)+
-        labs(title="Mortality Rate by Month",
-             x="Month",
-             y="Mortality Rate")+
-        theme_minimal()
+        mutate(category = floor(hour)) %>%
+        group_by(category) %>%
+        summarise(
+          mortality_rate = mean(mort30 == "Yes", na.rm = TRUE),
+          .groups = "drop"
+        )
       
-    } else if(input$timing == "Day of Week"){
-      
+    } else if (input$timing == "Day of Week") {
       surgery %>%
-        mutate(dow=factor(dow,
-                          levels=c("Mon","Tue","Wed","Thu","Fri"))) %>%
-        group_by(dow) %>%
-        summarize(mortality_rate=mean(mort30=="Yes", na.rm=TRUE)) %>%
-        ggplot(aes(dow, mortality_rate))+
-        geom_col(fill="turquoise4", color="black")+
-        scale_y_continuous(labels=scales::percent)+
-        labs(title="Mortality Rate by Day of Week",
-             x="Day",
-             y="Mortality Rate")+
-        theme_minimal()
+        mutate(category = factor(dow, levels = c("Mon", "Tue", "Wed", "Thu", "Fri"))) %>%
+        group_by(category) %>%
+        summarise(
+          mortality_rate = mean(mort30 == "Yes", na.rm = TRUE),
+          .groups = "drop"
+        )
+      
+    } else if (input$timing == "Month") {
+      surgery %>%
+        filter(!is.na(month), month != "NA") %>%
+        mutate(category = factor(month, levels = c(
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ))) %>%
+        group_by(category) %>%
+        summarise(
+          mortality_rate = mean(mort30 == "Yes", na.rm = TRUE),
+          .groups = "drop"
+        )
       
     } else {
-      
-      surgery %>% 
-        group_by(moonphase) %>% 
-        summarize(mortality_rate = mean(mort30=="Yes", na.rm=TRUE)) %>%
-        ggplot(aes(moonphase, mortality_rate, group=1))+
-        geom_point(size=3, color="turquoise4")+
-        geom_line(color="turquoise4")+
-        scale_y_continuous(labels=scales::percent)+
-        labs(title="Mortality Rate by Moon Phase",
-             x="Moon Phase",
-             y="Mortality Rate")+
-        theme_minimal()
+      surgery %>%
+        filter(!is.na(moonphase), moonphase != "NA") %>%
+        mutate(category = moonphase) %>%
+        group_by(category) %>%
+        summarise(
+          mortality_rate = mean(mort30 == "Yes", na.rm = TRUE),
+          .groups = "drop"
+        )
+    }
+  })
+  
+  hour_data <- reactive({
+    surgery %>% 
+      mutate(hour_round = floor(hour)) %>% 
+      group_by(hour_round) %>% 
+      summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T), .groups = "drop")
+  })
+  
+  output$highest_label <- renderText({
+    paste("Highest Mortality", input$timing)
+  })
+  
+  output$lowest_label <- renderText({
+    paste("Lowest Mortality", input$timing)
+  })
+  
+  output$highest_value <- renderText({
+    data <- summary_data()
+    
+    highest <- data %>%
+      filter(mortality_rate == max(mortality_rate, na.rm = TRUE))
+    
+    value <- as.character(highest$category[1])
+    
+    if (input$timing == "Hour") {
+      paste0(value, ":00")
+    } else {
+      value
+    }
+  })
+  
+  output$lowest_value <- renderText({
+    data <- summary_data()
+    
+    lowest <- data %>%
+      filter(mortality_rate == min(mortality_rate, na.rm = TRUE))
+    
+    value <- as.character(lowest$category[1])
+    
+    if (input$timing == "Hour") {
+      paste0(value, ":00")
+    } else {
+      value
+    }
+  })
+  
+  output$overall_mortality <- renderText({
+    rate <- mean(surgery$mort30 == "Yes", na.rm = T) 
+    scales::percent(rate, accuracy = 0.01)
+  })
+  
+  output$plot <- renderPlot({
+    
+    if (is.null(input$timing) || input$timing == "") {
+      return(NULL)
     }
     
+    if (input$timing == "Hour") {
+      plot_data <- surgery %>% 
+        mutate(hour_round = floor(hour)) %>% 
+        group_by(hour_round) %>% 
+        summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T), .groups = "drop")
+      
+      ggplot(plot_data, aes(x = factor(hour_round), y = mortality_rate))+
+        geom_col(fill = input$plot_color, color = "black", alpha = 0.9)+
+        scale_y_continuous(labels = percent)+
+        labs( title = "Mortality Rate by Operation Hour",
+              x = "Hour",
+              y = "Mortality Rate")+
+        theme_minimal()+
+        theme(
+          plot.title = element_text(face = "bold", size = 18, hjust = 0.5, color = "maroon"),
+          axis.title = element_text(face = "bold"),
+          panel.grid.minor = element_blank()
+        )
+    }
+    
+    else if (input$timing == "Day of Week")
+    {
+      plot_data <- surgery %>% 
+        mutate(dow = factor(dow, levels = c("Mon", "Tue", "Wed", "Thu", "Fri"))) %>% 
+        group_by(dow) %>% 
+        summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T), .groups = "drop")
+      
+      ggplot(plot_data, aes(x = dow, y = mortality_rate))+
+        geom_col(fill = input$plot_color, color = "black", alpha = 0.9)+
+        scale_y_continuous(labels = percent)+
+        labs( title = "Mortality Rate by DOW",
+              x = "Day of Week",
+              y = "Mortality Rate")+
+        theme_minimal()+
+        theme(
+          plot.title = element_text(face = "bold", size = 18, hjust = 0.5, color = "maroon"),
+          axis.title = element_text(face = "bold"),
+          panel.grid.minor = element_blank()
+        )
+    }
+    else if (input$timing == "Month")
+    {
+      plot_data <- surgery %>% 
+        filter(month != "NA") %>% 
+        mutate(month = factor(month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "June",
+                                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))) %>% 
+        group_by(month) %>% 
+        summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T), .groups = "drop")
+      
+      p <- ggplot(plot_data, aes(x = month, y = mortality_rate, group = 1))+
+        geom_line(color = input$plot_color)
+      
+      if (input$show_points){
+        p <- p + geom_point (size = 4, color = input$plot_color)
+      }
+      
+      p+
+        scale_y_continuous(labels = percent)+
+        labs( title = "Mortality Rate by Month",
+              x = "Month",
+              y = "Mortality Rate")+
+        theme_minimal()+
+        theme(
+          plot.title = element_text(face = "bold", size = 18, hjust = 0.5, color = "maroon"),
+          axis.title = element_text(face = "bold"),
+          panel.grid.minor = element_blank()
+        )
+    }
+    else {
+      plot_data <- surgery %>% 
+        group_by(moonphase) %>% 
+        summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T), .groups = "drop")
+      
+      p <- ggplot(plot_data, aes(x = moonphase, y = mortality_rate, group = 1))+
+        geom_line(color = input$plot_color)
+      
+      if (isTRUE(input$show_points)){
+        p <- p + geom_point (size = 4, color = input$plot_color)
+      }
+      
+      p +
+        scale_y_continuous(labels = percent)+
+        labs( title = "Mortality Rate by Moonphase",
+              x = "Phase of Moon",
+              y = "Mortality Rate")+
+        theme_minimal()+
+        theme(
+          plot.title = element_text(face = "bold", size = 18, hjust = 0.5, color = "maroon"),
+          axis.title = element_text(face = "bold"),
+          panel.grid.minor = element_blank()
+        )
+    }
   })
 }
 
 shinyApp(ui, server)
-      
