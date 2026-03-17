@@ -38,7 +38,7 @@ names(surgery)
 
 1. Which race had the highest number of surgeries?
 #Daniella
-#Caucasians had the highest number of surgeries
+#Caucasians had the highest number of surgeries, indicating they make up the largest portion of patients undergoing these procedures.
 ```{r}
 surgery %>% 
   group_by(race) %>% 
@@ -60,7 +60,7 @@ surgery %>%
 
 2.At what age do people undergo surgery more? 
 #Daniella
-#90 year olds underwent surgery the most
+# Patients around age 90 had the highest number of surgeries, suggesting that older age groups are more frequently represented in this dataset.
 ```{r}
 surgery %>% 
   group_by(age) %>% 
@@ -80,7 +80,7 @@ surgery %>%
 
 3.Who gets more surgeries, males or females ?
 #Daniella
-#Females get more surgeries than males
+#Females get more surgeries than males, suggesting that women have more complications than males.
 ```{r}
 surgery %>% 
   filter(gender != "NA") %>% 
@@ -105,7 +105,7 @@ surgery %>%
 
 4.Is mortality higher in males or females?
 #Aaliyah
-#Mortality is higher in males than in females
+# Mortality is higher in males than in females, meaning more male patients died within 30 days after surgery. 
 ```{r}
 surgery %>%
   filter(gender != "NA") %>%
@@ -126,7 +126,7 @@ surgery %>%
 
 5.Does ASA status predict mortality?
 #Aaliyah
-#ASA statuses IV-VI have the highest mortality rates, albeit it is only 4%
+# ASA statuses IV–VI have the highest mortality rates, although the overall rate is still relatively low at around 4%.
 ```{r}
 surgery %>%
   filter(asa_status!="NA") %>% 
@@ -214,7 +214,7 @@ surgery %>%
 ```
 9.Is there any association between moon phase and mortality?
 #Ale
-#Full moons have the highest mortality rate, while the new moon has the lowest mortality rate
+# Mortality is highest during the full moon, though the variation across moon phases remains minimal.
 ```{r}
 moon <- surgery %>% 
   group_by(moonphase) %>% 
@@ -261,6 +261,8 @@ surgery %>%
 
 11.Does the day of the week that a surgery is performed affect patient mortality?
 #Ale
+# Mortality changes slightly across different days of the week, suggesting that timing within the week may have a small effect on patient outcomes.
+
 ```{r}
 surgery %>%
   filter(dow != "NA") %>%
@@ -277,6 +279,7 @@ surgery %>%
   ) +
   theme_minimal()
 ```
+
 
 12.Shiny App 
 #Daniella 
