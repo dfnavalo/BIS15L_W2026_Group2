@@ -37,6 +37,7 @@ names(surgery)
 ```
 
 1. Which race had the highest number of surgeries?
+#Daniella
 #Caucasians had the highest number of surgeries
 ```{r}
 surgery %>% 
@@ -58,6 +59,7 @@ surgery %>%
 ```
 
 2.At what age do people undergo surgery more? 
+#Daniella
 #90 year olds underwent surgery the most
 ```{r}
 surgery %>% 
@@ -77,6 +79,7 @@ surgery %>%
 ```
 
 3.Who gets more surgeries, males or females ?
+#Daniella
 #Females get more surgeries than males
 ```{r}
 surgery %>% 
@@ -101,6 +104,7 @@ surgery %>%
 ```
 
 4.Is mortality higher in males or females?
+#Aaliyah
 #Mortality is higher in males than in females
 ```{r}
 surgery %>%
@@ -121,6 +125,7 @@ surgery %>%
 
 
 5.Does ASA status predict mortality?
+#Aaliyah
 #ASA statuses IV-VI have the highest mortality rates, albeit it is only 4%
 ```{r}
 surgery %>%
@@ -145,6 +150,7 @@ surgery %>%
 
 
 6. What is the distribution of age for each ASA status? Is there a relationship?
+#Aaliyah
 #The older someone seems to get, the higher the ASA status is, with the density graphs skewing further left the higher the ASA status levels go
 ```{r}
 surgery %>%
@@ -161,6 +167,8 @@ surgery %>%
 
 
 7.Do 30-day mortality rates differ by type of surgical procedure?
+#Aaliyah
+#Yes, 30-day mortality rates differ by type of surgical procedure, with procedures like colorectal resection and small bowel resection showing higher mortality rates compared to others with much lower rates.
 ```{r}
 surgery %>% 
   group_by(ahrq_ccs) %>% 
@@ -175,6 +183,7 @@ surgery %>%
 ```
 
 8.What month is mortality highest in and what month is the best for surgery?
+#Ale
 #January appears to have the highest mortality rate, while November appears to have the lowest mortality rate, meaning november is the best month to have surgery. 
 ```{r}
 surgery %>%
@@ -204,6 +213,7 @@ surgery %>%
   theme_minimal()
 ```
 9.Is there any association between moon phase and mortality?
+#Ale
 #Full moons have the highest mortality rate, while the new moon has the lowest mortality rate
 ```{r}
 moon <- surgery %>% 
@@ -231,6 +241,7 @@ moon %>%
 ```
 
 10. What surgery hour is associated with the highest mortality rate?
+#Ale
 #The mortality rate varies slightly depending on the hour of surgery. Surgeries performed earlier in the day tend to have lower mortality rates, while surgeries later in the afternoon show slightly higher mortality rates, suggesting that earlier surgery times may be associated with better patient outcomes.
 ```{r}
 surgery %>% 
@@ -249,6 +260,7 @@ surgery %>%
 ```
 
 11.Does the day of the week that a surgery is performed affect patient mortality?
+#Ale
 ```{r}
 surgery %>%
   filter(dow != "NA") %>%
@@ -266,7 +278,8 @@ surgery %>%
   theme_minimal()
 ```
 
-12.Shiny App
+12.Shiny App 
+#Daniella 
 
 ```{r}
 library(shiny)
