@@ -360,6 +360,7 @@ server <- function(input, output, session) {
 
 shinyApp(ui, server)
 ```
+
 ```{r}
 library(shiny)
 
@@ -490,7 +491,7 @@ server <- function(input, output, session) {
     paste0(highest$hour_round[1], ":00")
   })
   
-   output$lowestt_hour <- renderText({
+   output$lowest_hour <- renderText({
     lowest <- hour_data() %>% 
       filter(mortality_rate == min(mortality_rate, na.rm = T))
     
@@ -528,7 +529,7 @@ server <- function(input, output, session) {
           )
       }
       
-      else if (input$timin == "Day of Week")
+      else if (input$timing == "Day of Week")
       {
         plot_data <- surgery %>% 
           mutate(dow = factor(dow, levels = c("Mon", "Tue", "Wed", "Thu", "Fri"))) %>% 
@@ -552,7 +553,7 @@ server <- function(input, output, session) {
       {
         plot_data <- surgery %>% 
           filter(month != "NA") %>% 
-          mutate(factor(month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "June",
+          mutate(month = factor(month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "June",
                                           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))) %>% 
           group_by(month) %>% 
           summarize(mortality_rate = mean(mort30 == "Yes", na.rm = T), .groups = "drop")
