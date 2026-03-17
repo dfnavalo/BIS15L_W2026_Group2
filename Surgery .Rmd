@@ -23,6 +23,7 @@ library(scales)
 ## Project Overview
 This project analyzes whether surgery timing is associated with patient outcomes using data from 32,001 elective general surgery patients treated at Cleveland Clinic between 2005 and 2010.
 
+## Why is this here?
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 Surgery Timing: A dataset from 32,001 elective general surgery patients who were treated at Cleveland Clinic between 2005 and 2010. It is well known that lack of sleep and heavy workloads can negatively affect performance. Hospital staff frequently face these challenges, especially during busier periods. Because of this, researchers wanted to determine whether the time at which surgery is performed has any impact on patient outcomes.
